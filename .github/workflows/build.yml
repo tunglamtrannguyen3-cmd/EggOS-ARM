@@ -24,10 +24,18 @@ jobs:
       - name: Run SPARK Formal Verification
         run: |
           alr exec -- gnatprove -P eggos.gpr --level=4 --report=all || {
-            echo "--- GNATPROVE FAILED. PRINTING REPORT ---"
-            if [ -f "gnatprove/gnatprove.out" ]; then
+            echo "--- GNATPROVE FAILED. SEARCHING FOR REPORTS ---"
+            
+            # Check common object directories where gnatprove stores results
+            if [ -f "obj/gnatprove/gnatprove.out" ]; then
+              cat obj/gnatprove/gnatprove.out
+            elif [ -f "gnatprove/gnatprove.out" ]; then
               cat gnatprove/gnatprove.out
+            else
+              # Fallback: find any file ending in .out or .rep in the workspace
+              find . -name "gnatprove.out" -o -name "*.rep" -exec cat {} +
             fi
+            
             exit 1
           }
 
