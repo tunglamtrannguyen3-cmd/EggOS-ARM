@@ -7,10 +7,4 @@ maintainers = ["Eggchese <tunglamtrannguyen3@gmail.com>"]
 maintainers-logins = []
 
 [build-profiles]
-development = [
-   "-gnat2022",
-   "-gnatwa",
-   "-gnatwe",
-   "-gnaty",
-   "-gnatyg"
-]
+development = "-gnat2022 -gnatwa -gnatwe -gnaty -gnatyg"
