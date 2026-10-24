@@ -25,3 +25,7 @@ jobs:
         run: |
           # Verify contracts, safety properties, and absence of run-time errors
           alr exec -- gnatprove -P eggos.gpr --level=4 --report=all
+
+      - name: Build EggOS Binary (Native Test)
+        run: |
+          alr exec -- gprbuild -P eggos.gpr
