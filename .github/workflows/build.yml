@@ -23,8 +23,13 @@ jobs:
 
       - name: Run SPARK Formal Verification
         run: |
-          # Verify contracts, safety properties, and absence of run-time errors
-          alr exec -- gnatprove -P eggos.gpr --level=4 --report=all
+          alr exec -- gnatprove -P eggos.gpr --level=4 --report=all || {
+            echo "--- GNATPROVE FAILED. PRINTING REPORT ---"
+            if [ -f "gnatprove/gnatprove.out" ]; then
+              cat gnatprove/gnatprove.out
+            fi
+            exit 1
+          }
 
       - name: Build EggOS Binary (Native Test)
         run: |
