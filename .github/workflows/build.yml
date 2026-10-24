@@ -17,11 +17,17 @@ jobs:
       - name: Setup Alire & Ada/SPARK Toolchain
         uses: alire-project/setup-alire@v3
 
+      - name: Configure Toolchain
+        run: |
+          # Automatically select and initialize the native GNAT compiler and gprbuild
+          alr toolchain --select gnat_native gprbuild
+
       - name: Run SPARK Formal Verification
         run: |
-          # Alire provides gnatprove automatically
-          gnatprove -P eggos.gpr --level=4 --report=all || echo "GNATprove finished with warnings"
+          # Verify contracts using your eggos.gpr project configuration[cite: 13]
+          alr exec -- gnatprove -P eggos.gpr --level=4 --report=all || echo "GNATprove finished with warnings"
 
       - name: Build EggOS Bare-Metal Binary
         run: |
-          gprbuild -P eggos.gpr --target=aarch64-elf
+          # Build the cross-target binary using gprbuild
+          alr exec -- gprbuild -P eggos.gpr --target=aarch64-elf
