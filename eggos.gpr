@@ -1,0 +1,35 @@
+project Eggos is
+
+   for Source_Dirs use
+     ("hypervisor/src",
+      "hypervisor/security",
+      "boards/qemu",
+      "common/src",
+      "virtual/src");
+
+   for Object_Dir use "obj";
+   for Exec_Dir   use ".";
+   for Main       use ("hypervisor_main.adb");
+
+   package Compiler is
+      for Default_Switches ("Ada") use
+        ("-gnat2022",
+         "-gnatwa",
+         "-gnatwe",
+         "-gnaty",
+         "-gnatyg",
+         "-ffunction-sections",
+         "-fdata-sections");
+   end Compiler;
+
+   package Builder is
+      for Default_Switches ("Ada") use ("-s", "-j0");
+   end Builder;
+
+   package Prove is
+      for Proof_Switches ("Ada") use
+        ("--level=4",
+         "--report=all");
+   end Prove;
+
+end Eggos;
