@@ -21,16 +21,14 @@ jobs:
 
       - name: Download and Setup ARM64 Bare-Metal Toolchain (aarch64-none-elf)
         run: |
-          # Download the official ARM GNU Toolchain for AArch64 bare-metal
           TOOLCHAIN_URL="https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-elf.tar.xz"
           wget -q $TOOLCHAIN_URL -O toolchain.tar.xz
           tar -xf toolchain.tar.xz
           
-          # Move it to a clean directory and add to PATH
-          sudo mv arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-elf /opt/aarch64-none-elf
+          # Dynamically move any extracted arm-gnu-toolchain folder safely
+          sudo mv arm-gnu-toolchain-* /opt/aarch64-none-elf
           echo "/opt/aarch64-none-elf/bin" >> $GITHUB_PATH
 
       - name: Build EggOS Bare-Metal Binary
         run: |
-          # Use the true bare-metal target
           gprbuild -P eggos.gpr --target=aarch64-none-elf
