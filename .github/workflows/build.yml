@@ -1,4 +1,4 @@
-name: Build and Verify EggOS
+name: Verify and Build EggOS
 
 on:
   push:
@@ -14,17 +14,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Ada & SPARK Toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gnat gprbuild gnat-aarch64-linux-gnu gcc-aarch64-linux-gnu
+      - name: Setup Alire & Ada/SPARK Toolchain
+        uses: alire-project/setup-alire@v3
 
       - name: Run SPARK Formal Verification
         run: |
-          # Verify contracts, safety properties, and absence of run-time errors first
+          # Alire provides gnatprove automatically
           gnatprove -P eggos.gpr --level=4 --report=all || echo "GNATprove finished with warnings"
 
-      - name: Build EggOS Project
+      - name: Build EggOS Bare-Metal Binary
         run: |
-          # Compile and link the cross-target AArch64 executable
-          gprbuild -P eggos.gpr --target=aarch64-linux-gnu
+          gprbuild -P eggos.gpr --target=aarch64-elf
