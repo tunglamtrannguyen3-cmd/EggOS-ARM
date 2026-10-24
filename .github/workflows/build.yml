@@ -1,4 +1,4 @@
-name: Verify and Build EggOS
+name: Verify EggOS
 
 on:
   push:
@@ -7,28 +7,21 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Native GNAT (for gprbuild)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gnat gprbuild
+      - name: Setup Alire & Ada/SPARK Toolchain
+        uses: alire-project/setup-alire@v3
 
-      - name: Download and Setup ARM64 Bare-Metal Toolchain (aarch64-none-elf)
+      - name: Configure Toolchain
         run: |
-          TOOLCHAIN_URL="https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-elf.tar.xz"
-          wget -q $TOOLCHAIN_URL -O toolchain.tar.xz
-          tar -xf toolchain.tar.xz
-          
-          # Dynamically move any extracted arm-gnu-toolchain folder safely
-          sudo mv arm-gnu-toolchain-* /opt/aarch64-none-elf
-          echo "/opt/aarch64-none-elf/bin" >> $GITHUB_PATH
+          alr toolchain --select gnat_native gprbuild
 
-      - name: Build EggOS Bare-Metal Binary
+      - name: Run SPARK Formal Verification
         run: |
-          gprbuild -P eggos.gpr --target=aarch64-none-elf
+          # Verify contracts, safety properties, and absence of run-time errors
+          alr exec -- gnatprove -P eggos.gpr --level=4 --report=all
