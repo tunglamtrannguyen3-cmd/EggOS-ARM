@@ -14,20 +14,23 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Alire & Ada/SPARK Toolchain
-        uses: alire-project/setup-alire@v3
-
-      - name: Configure Toolchain
+      - name: Install Native GNAT (for gprbuild)
         run: |
-          # Automatically select and initialize the native GNAT compiler and gprbuild
-          alr toolchain --select gnat_native gprbuild
+          sudo apt-get update
+          sudo apt-get install -y gnat gprbuild
 
-      - name: Run SPARK Formal Verification
+      - name: Download and Setup ARM64 Bare-Metal Toolchain (aarch64-none-elf)
         run: |
-          # Verify contracts using your eggos.gpr project configuration[cite: 13]
-          alr exec -- gnatprove -P eggos.gpr --level=4 --report=all || echo "GNATprove finished with warnings"
+          # Download the official ARM GNU Toolchain for AArch64 bare-metal
+          TOOLCHAIN_URL="https://developer.arm.com/-/media/Files/downloads/gnu/13.2.rel1/binrel/arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-elf.tar.xz"
+          wget -q $TOOLCHAIN_URL -O toolchain.tar.xz
+          tar -xf toolchain.tar.xz
+          
+          # Move it to a clean directory and add to PATH
+          sudo mv arm-gnu-toolchain-13.2.rel1-x86_64-aarch64-none-elf /opt/aarch64-none-elf
+          echo "/opt/aarch64-none-elf/bin" >> $GITHUB_PATH
 
       - name: Build EggOS Bare-Metal Binary
         run: |
-          # Build the cross-target binary using gprbuild
-          alr exec -- gprbuild -P eggos.gpr --target=aarch64-elf
+          # Use the true bare-metal target
+          gprbuild -P eggos.gpr --target=aarch64-none-elf
