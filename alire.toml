@@ -6,5 +6,3 @@ authors = ["Eggchese <tunglamtrannguyen3@gmail.com>"]
 maintainers = ["Eggchese <tunglamtrannguyen3@gmail.com>"]
 maintainers-logins = []
 
-[build-profiles]
-development = "-gnat2022 -gnatwa -gnatwe -gnaty -gnatyg"
